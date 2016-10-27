@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import sys, getopt
 from SimpleCV import Display, Image, Color
 import cv2
@@ -7,10 +5,23 @@ import numpy as np
 import time
 
 def spliceImg(img,doCrop=False):
-    # Cut the input image into four chunks and return the results
-    section = img.width/4;
+    '''
+    function:
+    ---------
+    split dual fish eyes into two frames.
+
+    params:
+    -------
+    @img: dual fisheye image.
+
+    returns:
+    ---------
+    @retVal: list of rgb matrices.
+    '''
+
+    section = img.width/2;
     retVal = []
-    for i in range(0,4):
+    for i in range(0,2):
         temp = img.crop(section*i,0,section,img.height)
         if( doCrop ):
             mask = temp.threshold(20)
@@ -147,25 +158,15 @@ def buildPano(defished):
     return final
 
 
-def main(argv):
-    inputfile = ''
-    outputdir = './'
-    try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-    except getopt.GetoptError:
-        print 'defish.py -i <inputfile> -o <outputdir>'
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print 'test.py -i <inputfile> -o <outputdir>'
-            sys.exit()
-        elif opt in ("-i", "--ifile"):
-            inputfile = arg
-        elif opt in ("-o", "--ofile"):
-            outputdir = arg
-    print 'Input file is: ', inputfile
-    print 'Output Dir is: ', outputdir
-    doPostCrop = True
+
+
+
+
+if __name__ == "__main__":
+    inputfile = sys.argv[1]
+    outputdir = 'images/'
+    
+    doPostCrop = False
     img = Image(inputfile)
     sections = spliceImg(img,not doPostCrop)
     temp = sections[0]
@@ -191,18 +192,9 @@ def main(argv):
         temp = result.sideBySide(s)
         temp.save("{0}View{1}.png".format(outputdir,idx))
         result.save("{0}DeWarp{1}.png".format(outputdir,idx))
-        temp.show()
-        time.sleep(1)
     # Build the pano 
     final = buildPano(defished)
-    final.show()
     final.save('{0}final.png'.format(outputdir))
-    time.sleep(10)
-
-
-
-if __name__ == "__main__":
-   main(sys.argv[1:])
 
 
          
