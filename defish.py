@@ -164,30 +164,26 @@ def buildPano(defished):
 
 if __name__ == "__main__":
     inputfile = sys.argv[1]
-    outputdir = 'images/'
+    outputdir = 'output/'
     
     doPostCrop = False
     img = Image(inputfile)
     sections = spliceImg(img,not doPostCrop)
+
+    # define dimensions for dewarping
     temp = sections[0]
-    # we may want to make a new map per image for better
-    # results in the long run
-    # You can change these parameters to get different sized
-    # outputs
     Ws = temp.width
     Hs = temp.height
     Wd = temp.width*(4.0/3.0)
     Hd = temp.height
-    print "BUILDING MAP..."
+
     mapx,mapy = buildMap(Ws,Hs,Wd,Hd)
-    print "MAP DONE"
     defished = []
     # do our dewarping and save/show the results
     for s,idx  in zip(sections,range(0,len(sections))):
         result = unwarp(s,mapx,mapy)
         if(doPostCrop):
             result = postCrop(result)
-    #    result = result.edges()
         defished.append(result)
         temp = result.sideBySide(s)
         temp.save("{0}View{1}.png".format(outputdir,idx))
