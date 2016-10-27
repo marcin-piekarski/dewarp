@@ -5,9 +5,11 @@ dewarping & stitching fisheye images
 
 ## methodology
 
-* 1) split dual fish eyes into two images
-* 2) dewarp each image
-* 3) align & stitch each image
+first, split dual fisheyes into two images.
+
+then, dewarp each image.
+
+finally, align & stitch each image.
 
 ## run
 
