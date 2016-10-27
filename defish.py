@@ -172,14 +172,16 @@ if __name__ == "__main__":
     Hd = temp.height
 
     mapx,mapy = buildMap(Ws,Hs,Wd,Hd)
+    
+    # dewarp
     defished = []
-    # do our dewarping and save/show the results
     for s,idx  in zip(sections,range(0,len(sections))):
         result = unwarp(s,mapx,mapy)
         defished.append(result)
         temp = result.sideBySide(s)
         temp.save("{0}View{1}.png".format(outputdir,idx))
         result.save("{0}DeWarp{1}.png".format(outputdir,idx))
+    
     # Build the pano 
     final = buildPano(defished)
     final.save('{0}final.png'.format(outputdir))
