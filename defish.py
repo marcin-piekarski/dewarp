@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import time
 
-def spliceImg(img,doCrop=False):
+def spliceImg(img):
     '''
     function:
     ---------
@@ -23,12 +23,11 @@ def spliceImg(img,doCrop=False):
     retVal = []
     for i in range(0,2):
         temp = img.crop(section*i,0,section,img.height)
-        if( doCrop ):
-            mask = temp.threshold(20)
-            b = temp.findBlobsFromMask(mask)
-            temp = b[-1].hullImage()
-            m = np.max([temp.width,temp.height])
-            temp = temp.resize(m,m)
+        mask = temp.threshold(20)
+        b = temp.findBlobsFromMask(mask)
+        temp = b[-1].hullImage()
+        m = np.max([temp.width,temp.height])
+        temp = temp.resize(m,m)
         retVal.append(temp)
     return retVal
 
@@ -74,10 +73,6 @@ def unwarp(img,xmap,ymap):
     output = cv2.remap(img.getNumpyCv2(),xmap,ymap,cv2.INTER_LINEAR)
     result = Image(output,cv2image=True)
     return result
-
-def postCrop(img,threshold=10):
-    # Crop the image after dewarping
-    return img.crop(img.width*0.2,img.height*0.1,img.width*.6,img.height*0.8)
 
 
 def findHomography(img,template,quality=500.00,minDist=0.2,minMatch=0.4):
@@ -165,10 +160,9 @@ def buildPano(defished):
 if __name__ == "__main__":
     inputfile = sys.argv[1]
     outputdir = 'output/'
-    
-    doPostCrop = False
+
     img = Image(inputfile)
-    sections = spliceImg(img,not doPostCrop)
+    sections = spliceImg(img)
 
     # define dimensions for dewarping
     temp = sections[0]
@@ -182,8 +176,6 @@ if __name__ == "__main__":
     # do our dewarping and save/show the results
     for s,idx  in zip(sections,range(0,len(sections))):
         result = unwarp(s,mapx,mapy)
-        if(doPostCrop):
-            result = postCrop(result)
         defished.append(result)
         temp = result.sideBySide(s)
         temp.save("{0}View{1}.png".format(outputdir,idx))
